@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Supermarket POS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .pos-container { max-width: 800px; margin: 30px auto; }
+        .cart-item { font-size: 1.2rem; }
+        .total-display { font-size: 2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container pos-container">
+    <h1 class="text-center mb-4">Supermarket POS</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text" id="scanner-icon">🔍</span>
+                <input type="text" class="form-control" id="barcodeInput" placeholder="Scan Barcode (Enter)" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Cart</h4>
+        </div>
+        <ul class="list-group list-group-flush" id="cartList">
+            <!-- Cart items will go here -->
+        </ul>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <span class="total-display">Total: $<span id="totalAmount">0.00</span></span>
+            <button class="btn btn-success btn-lg" id="checkoutBtn" disabled>Checkout</button>
+        </div>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Participant Login</h5>
+            </div>
+            <div class="modal-body">
+                <p>Please enter the Participant ID to begin.</p>
+                <input type="text" class="form-control form-control-lg" id="participantIdInput" placeholder="e.g., P-101">
+                <div id="loginError" class="text-danger mt-2" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="loginBtn">Start Session</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let participantId = null;
+    let cart = [];
+    let total = 0.0;
+
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    const barcodeInput = document.getElementById('barcodeInput');
+    const cartList = document.getElementById('cartList');
+    const totalAmountSpan = document.getElementById('totalAmount');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+
+    // Show login modal on load
+    window.addEventListener('load', () => {
+        loginModal.show();
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const input = document.getElementById('participantIdInput').value.trim();
+        if (input) {
+            participantId = input;
+            loginModal.hide();
+            barcodeInput.focus();
+        } else {
+            document.getElementById('loginError').textContent = "Participant ID is required.";
+            document.getElementById('loginError').style.display = 'block';
+        }
+    });
+
+    barcodeInput.addEventListener('keypress', async (e) => {
+        if (e.key === 'Enter') {
+            const barcode = barcodeInput.value.trim();
+            if (barcode) {
+                await addItemToCart(barcode);
+                barcodeInput.value = '';
+            }
+        }
+    });
+
+    async function addItemToCart(barcode) {
+        try {
+            const response = await fetch(`/api/product/${barcode}`);
+            if (!response.ok) {
+                alert("Product not found!");
+                return;
+            }
+            const product = await response.json();
+            
+            // Check if already in cart
+            const existingItem = cart.find(item => item.barcode === barcode);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    barcode: product.barcode,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1
+                });
+            }
+            updateCartUI();
+        } catch (error) {
+            console.error("Error fetching product:", error);
+            alert("Error fetching product details.");
+        }
+    }
+
+    function updateCartUI() {
+        cartList.innerHTML = '';
+        total = 0.0;
+        
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center cart-item';
+            li.innerHTML = `
+                <div>
+                    <strong>${item.name}</strong> <span class="text-muted">x${item.quantity}</span>
+                </div>
+                <span>$${itemTotal.toFixed(2)}</span>
+            `;
+            cartList.appendChild(li);
+        });
+
+        totalAmountSpan.textContent = total.toFixed(2);
+        checkoutBtn.disabled = cart.length === 0;
+    }
+
+    checkoutBtn.addEventListener('click', async () => {
+        if (!participantId || cart.length === 0) return;
+
+        const payload = {
+            participant_external_id: participantId,
+            items: cart.map(item => ({ barcode: item.barcode, quantity: item.quantity }))
+        };
+
+        try {
+            const response = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Transaction Recorded! ID: ${result.transaction_id}`);
+                cart = [];
+                updateCartUI();
+                // Optional: Reset participant for next user? keeping same for now.
+            } else {
+                const error = await response.json();
+                alert(`Checkout Failed: ${error.detail}`);
+            }
+        } catch (error) {
+            console.error("Checkout error:", error);
+            alert("Checkout failed due to network error.");
+        }
+    });
+</script>
+</body>
+</html>

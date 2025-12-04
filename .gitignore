@@ -1,0 +1,23 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Mac system files
+.DS_Store
+
+# Data export
+*.csv
+*.xlsx
+
+# Editor settings
+.vscode/

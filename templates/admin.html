@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Lab Supermarket - Research Dashboard</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Inventory Status</h2>
+            <a href="/api/export/csv" class="btn btn-outline-primary">Export Research Data</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Barcode</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                    <!-- Rows will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadInventory() {
+            try {
+                const response = await fetch('/api/products');
+                const products = await response.json();
+                const tableBody = document.getElementById('inventoryTableBody');
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                products.forEach(product => {
+                    const tr = document.createElement('tr');
+
+                    // Expiry Logic
+                    const expiryDate = new Date(product.expiry_date);
+                    const diffTime = expiryDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays <= 7) {
+                        tr.classList.add('table-danger');
+                    }
+
+                    tr.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.barcode}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>${product.stock_quantity}</td>
+                    <td>${product.expiry_date}</td>
+                `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error("Error loading inventory:", error);
+            }
+        }
+
+        window.addEventListener('load', loadInventory);
+    </script>
+</body>
+
+</html>
