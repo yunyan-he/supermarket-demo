@@ -166,6 +166,26 @@ def checkout(request: schemas.CheckoutRequest, db: Session = Depends(get_db)):
     
     return {"transaction_id": transaction.id, "total_amount": total_amount, "status": "success"}
 
+@app.get("/api/participant/{external_id}")
+def get_participant(external_id: str, db: Session = Depends(get_db)):
+    """
+    Validates if a participant exists.
+    
+    Args:
+        external_id (str): The participant ID to check.
+        db (Session): Database session.
+        
+    Returns:
+        dict: Participant details if found.
+        
+    Raises:
+        HTTPException(404): If participant is not found.
+    """
+    participant = db.query(models.Participant).filter(models.Participant.external_id == external_id).first()
+    if not participant:
+        raise HTTPException(status_code=404, detail="Participant not found")
+    return {"id": participant.id, "external_id": participant.external_id, "group_id": participant.group_id}
+
 @app.post("/api/external/camera")
 def external_camera_event(payload: Dict[str, Any]):
     """
