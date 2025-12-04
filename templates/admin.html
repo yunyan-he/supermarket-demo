@@ -59,8 +59,10 @@
                     const diffTime = expiryDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                    if (diffDays <= 7) {
-                        tr.classList.add('table-danger');
+                    if (diffDays < 0) {
+                        tr.classList.add('table-danger'); // Already Expired (Red)
+                    } else if (diffDays <= 7) {
+                        tr.classList.add('table-warning'); // Expiring Soon (Yellow)
                     }
 
                     tr.innerHTML = `
