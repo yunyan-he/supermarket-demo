@@ -1,8 +1,8 @@
-# Lab Supermarket POS & Research Data Platform 🛒🔬
+# Lab Supermarket POS & Research Data Platform 
 
 > **Note:** This project was developed as a technical prototype specifically for the **Student Assistant (HiWi)** application at the **Institute for Food and Resource Economics (ILR), University of Bonn**.
 
-## 📖 Project Overview
+## Project Overview
 This is a full-stack **Point-of-Sale (POS) Simulation** designed to support consumer behavior research. Unlike standard commercial retail systems, this platform prioritizes **participant tracking** and **experimental data integrity**.
 
 It addresses the core requirements of the Lab Supermarket facility:
@@ -12,7 +12,7 @@ It addresses the core requirements of the Lab Supermarket facility:
 
 ---
 
-## 📸 Demo & Screenshots
+## Demo & Screenshots
 
 ### 1. The POS Interface (Simulation)
 ![Lab Supermarket POS Demo](assets/pos_demo.gif)
@@ -25,28 +25,28 @@ It addresses the core requirements of the Lab Supermarket facility:
 
 ---
 
-## 🚀 Key Features (System Thinking)
+## Key Features (System Thinking)
 
 I designed this system with **Experimental Control** in mind:
 
-* **🧪 Participant-First Logic:**
+* ** Participant-First Logic:**
     The system enforces a "Login" modal before every session. Transactions cannot proceed without a valid `Participant ID`. This ensures sales data is always linkable to demographic data.
 
-* **🔄 Auto-Session Reset:**
+* ** Auto-Session Reset:**
     To prevent data contamination between test subjects, the system **automatically logs out** and resets the session immediately after a successful checkout, ready for the next participant.
 
-* **📅 Smart Expiry Tracking:**
+* ** Smart Expiry Tracking:**
     The database tracks `expiry_date` for every product. The Admin Dashboard provides visual alerts for near-expiry stock, facilitating research on "Best Before Date" consumer behavior.
 
-* **📊 Automated Data Pipeline:**
+* ** Automated Data Pipeline:**
     Includes a one-click **CSV Export** feature using `Pandas`. It generates a flat-file dataset merging *Transactions*, *Participants*, and *Products*, ready for analysis in SPSS or R.
 
-* **🔌 Future-Ready Architecture:**
+* ** Future-Ready Architecture:**
     Built with API endpoints ready to accept mock data from external hardware (e.g., cameras or eye-tracking sensors), facilitating future "Data Fusion" tasks.
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 * **Backend:** Python 3.9+, **FastAPI** (High performance, easy API extension).
 * **Database:** **SQLAlchemy** (ORM) + SQLite (Zero-configuration for MVP).
@@ -55,7 +55,7 @@ I designed this system with **Experimental Control** in mind:
 
 ---
 
-## 📦 How to Run
+## How to Run
 
 If you want to test the application locally:
 
@@ -87,6 +87,6 @@ If you want to test the application locally:
 
 ---
 
-## 👨‍💻 Author
+## Author
 **[YUNYAN HE]**
 Master’s student in Human-Centric Intelligent Systems (HCIS), RWTH Aachen University and the University of Bonn
