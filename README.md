@@ -29,19 +29,19 @@ It addresses the core requirements of the Lab Supermarket facility:
 
 I designed this system with **Experimental Control** in mind:
 
-* ** Participant-First Logic:**
+- **Participant-First Logic:**
     The system enforces a "Login" modal before every session. Transactions cannot proceed without a valid `Participant ID`. This ensures sales data is always linkable to demographic data.
 
-* ** Auto-Session Reset:**
+- **Auto-Session Reset:**
     To prevent data contamination between test subjects, the system **automatically logs out** and resets the session immediately after a successful checkout, ready for the next participant.
 
-* ** Smart Expiry Tracking:**
+- **Smart Expiry Tracking:**
     The database tracks `expiry_date` for every product. The Admin Dashboard provides visual alerts for near-expiry stock, facilitating research on "Best Before Date" consumer behavior.
 
-* ** Automated Data Pipeline:**
+- **Automated Data Pipeline:**
     Includes a one-click **CSV Export** feature using `Pandas`. It generates a flat-file dataset merging *Transactions*, *Participants*, and *Products*, ready for analysis in SPSS or R.
 
-* ** Future-Ready Architecture:**
+- **Future-Ready Architecture:**
     Built with API endpoints ready to accept mock data from external hardware (e.g., cameras or eye-tracking sensors), facilitating future "Data Fusion" tasks.
 
 ---
